@@ -1,0 +1,20 @@
+BackEnd : 
+
+mkdir backend
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install fastapi "uvicorn[standard]"
+python -m uvicorn main:app --reload
+
+FrontEnd:
+
+cd $HOME\Desktop\ai-interview
+npm create vite@latest frontend -- --template react
+cd frontend
+npm install
+npm run dev
+
+
+For DB: 
+pip install sqlalchemy "psycopg[binary]" python-dotenv
