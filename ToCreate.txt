@@ -16,5 +16,5 @@ npm install
 npm run dev
 
 
-For DB: 
+For DB (SQLAlchemy): 
 pip install sqlalchemy "psycopg[binary]" python-dotenv
