@@ -18,3 +18,12 @@ npm run dev
 
 For DB (SQLAlchemy): 
 pip install sqlalchemy "psycopg[binary]" python-dotenv
+
+For Pass Hashing :
+pip install "pwdlib[argon2]"
+
+Email Validator :
+pip install email-validator
+
+For JWT :
+pip install PyJWT
