@@ -27,3 +27,6 @@ pip install email-validator
 
 For JWT :
 pip install PyJWT
+
+React Router :
+npm install react-router-dom

@@ -5,9 +5,18 @@ from database import get_db
 from models import Staff
 from security import hash_password, check_password, create_access_token
 from auth import get_current_user
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 ## New Users
 @app.post("/signup", status_code = 201)

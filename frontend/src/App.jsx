@@ -1,6 +1,7 @@
 import "./App.css";
 
 import { BrainCircuit, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { use, useState } from "react";
 
@@ -13,7 +14,7 @@ function App() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [forgetpassword, setForgotPassword] = useState(false);
-
+  const navigate = useNavigate();
   const handleSignUpLinkClick = (event) => {
     event.preventDefault();
     setIsLogin(!isLogin);
@@ -24,12 +25,36 @@ function App() {
     setFullName("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!isLogin && password !== confirmPassword) {
       setError("Password Dont Match");
+      return;
     } else {
       setError("");
+    }
+    const login = { email: email, password: password };
+    const signup = { full_name: fullName, email: email, password: password };
+    const url = isLogin
+      ? "http://127.0.0.1:8000/login"
+      : "http://127.0.0.1:8000/signup";
+
+    const payload = isLogin ? login : signup;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const token = data.access_token;
+      sessionStorage.setItem("Token", token);
+      navigate("/dashboard");
+    } else {
+      setError(data.detail);
     }
   };
 
