@@ -51,8 +51,8 @@ def login (data : StaffLogin, db : Session = Depends(get_db)):
   return {"token_type": "bearer", "access_token": token}
 
 
-@app.get("/profile")
-def profile (current_user : Staff = Depends(get_current_user)):
+@app.get("/verify-user", status_code = 200)
+def verify_user (current_user : Staff = Depends(get_current_user)):
   return{"user_id": current_user.id,"full_name" : current_user.full_name,"user_email":current_user.email}
 
 

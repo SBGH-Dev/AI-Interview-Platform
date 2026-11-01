@@ -3,7 +3,7 @@ import "./App.css";
 import { BrainCircuit, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import { use, useState } from "react";
+import { useState } from "react";
 
 function App() {
   const currentYear = new Date().getFullYear();
