@@ -1,4 +1,4 @@
-import "./App.css";
+import "../App.css";
 
 import { BrainCircuit, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -52,7 +52,7 @@ function App() {
     if (response.ok) {
       const token = data.access_token;
       sessionStorage.setItem("Token", token);
-      navigate("/dashboard");
+      navigate("/home");
     } else {
       setError(data.detail);
     }

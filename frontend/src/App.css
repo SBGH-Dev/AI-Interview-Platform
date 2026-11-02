@@ -1,5 +1,7 @@
 body {
   margin: 0;
+  /* background-color: #f7f7f7; */
+  font-family: Arial, sans-serif;
 }
 
 * {
@@ -8,7 +10,10 @@ body {
 
 .auth-container {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100dvh - 40px);
+  margin: 20px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .auth-left {
@@ -52,10 +57,11 @@ body {
 }
 .auth-right {
   width: 52%;
-  background-color: #fafbfd;
+  background-color: #ebedf1;
   display: flex;
   justify-content: center; /* Horizontal */
   align-items: center; /* Vertical */
+  padding: 30px 24px;
 }
 .form-container {
   width: 100%;
@@ -135,22 +141,22 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 90vh;
   width: 100%;
   padding: 30px 20px;
-  background-color: #102d46;
+  background-color: #ebedf1;
   font-family: Arial, sans-serif;
 }
 
 .forget-pass-page h1 {
   font-size: 34px;
-  color: white;
+  color: black;
   margin-bottom: 10px;
 }
 
 .forget-pass-page > p {
   font-size: 14px;
-  color: white;
+  color: black;
   text-align: center;
   margin-bottom: 30px;
 }
@@ -172,7 +178,7 @@ body {
 .forget-pass-page-input-group label {
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  color: black;
 }
 
 .forget-pass-page-input-group input {
@@ -206,7 +212,7 @@ body {
   margin-top: 20px;
 }
 .back-to-home a {
-  color: white;
+  color: black;
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -217,5 +223,97 @@ body {
 }
 
 .back-to-home svg {
-  color: white;
+  color: black;
+}
+
+@media (max-height: 700px) {
+  .auth-left {
+    padding: 25px 40px;
+  }
+
+  .hero-content h1 {
+    font-size: 40px;
+  }
+
+  .form-container h2 {
+    font-size: 28px;
+  }
+
+  .form-container > p {
+    margin-bottom: 15px;
+  }
+
+  .form-container form {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-left,
+  .auth-right {
+    width: 100%;
+  }
+
+  .auth-left {
+    padding: 25px;
+    gap: 30px;
+  }
+
+  .hero-content h1 {
+    font-size: 32px;
+  }
+
+  .auth-right {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-height: 800px) {
+  .auth-left {
+    padding: 25px 40px;
+  }
+
+  .auth-right {
+    padding: 20px 30px;
+  }
+
+  .form-container form {
+    gap: 8px;
+  }
+}
+
+@media (max-height: 850px) {
+  .auth-right {
+    padding: 15px 24px;
+  }
+
+  .form-container h2 {
+    font-size: 26px;
+    margin: 0 0 8px;
+  }
+
+  .form-container > p {
+    margin: 0 0 15px;
+  }
+
+  .form-container form {
+    gap: 8px;
+  }
+
+  .form-group {
+    gap: 5px;
+  }
+
+  .form-container input {
+    padding: 10px 14px;
+  }
+
+  .form-container button {
+    height: 44px;
+    flex-shrink: 0;
+  }
 }

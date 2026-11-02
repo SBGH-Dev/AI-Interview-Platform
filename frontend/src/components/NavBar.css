@@ -1,0 +1,63 @@
+.navbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 10px 20px;
+  gap: 20px;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #102d46;
+  font-weight: 600;
+}
+
+.navbar button {
+  justify-self: end;
+  border-radius: 25px;
+  padding: 6px 10px;
+  cursor: pointer;
+  background-color: #102d46;
+  color: white;
+  border: none;
+  font-size: 14px;
+}
+
+.navbar button:hover {
+  background-color: #67849d;
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.profile-icon {
+  display: flex;
+  align-items: center;
+  color: #102d46;
+}
+
+.profile-icon:hover {
+  color: #137f75;
+}
+
+.app-icon {
+  display: flex;
+  align-items: center;
+  color: #102d46;
+}
+
+.app-icon:hover {
+  color: #137f75;
+}
