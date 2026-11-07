@@ -70,8 +70,29 @@ function App() {
     setError("");
   };
 
-  const handleForgotPassword = (event) => {
+  const handleForgotPassword = async (event) => {
     event.preventDefault();
+    setError("");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setError(data.message);
+      } else {
+        setError("Failed to send reset link. Please try again.");
+      }
+    } catch (error) {
+      setError("Cannot connect to the server.");
+    }
   };
   return (
     <div className="auth-container">
@@ -198,10 +219,14 @@ function App() {
                   id="sendemail"
                   required
                   placeholder="email@example.com"
-                ></input>
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <button type="submit">Send Link</button>
             </form>
+
+            {error && <p className="reset-message">{error}</p>}
 
             <div className="back-to-home">
               <ArrowLeft size={20} />

@@ -1,11 +1,16 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from datetime import datetime, timedelta, timezone
+import hashlib
+import token
+
+from fastapi import Body, FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from schemas import StaffSignUp, StaffLogin
+from schemas import StaffSignUp, StaffLogin, ResetPasswordRequest
 from database import get_db
-from models import Staff
-from security import hash_password, check_password, create_access_token
+from models import Staff, PasswordResetToken
+from security import create_reset_password_token, hash_password, check_password, create_access_token
 from auth import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
+from email_service import send_reset_email
 
 
 app = FastAPI()
@@ -57,3 +62,47 @@ def verify_user (current_user : Staff = Depends(get_current_user)):
 
 
 
+@app.post("/forgot-password", status_code = 200)
+
+def forgot_password (email : str =Body(embed=True), db : Session = Depends(get_db)):
+  user = db.query(Staff).filter(Staff.email == email).first()
+  if not user:
+    return {"message": "If the email exists, password reset instructions will be sent"}
+
+  token = create_reset_password_token()
+  token_hash = hashlib.sha256(token.encode()).hexdigest()
+  user_id = user.id
+  expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+  reset_record = PasswordResetToken(user_id=user_id, token_hash=token_hash, expires_at=expires_at)
+  db.add(reset_record)
+  db.commit()
+  send_reset_email(user.email, token)
+
+  return {"message": "If the email exists, password reset instructions will be sent"}
+
+
+@app.post("/reset-password", status_code = 200)
+def reset_password (data : ResetPasswordRequest, db : Session = Depends(get_db)):
+  token_hash = hashlib.sha256(data.token.encode()).hexdigest()
+  reset_record = db.query(PasswordResetToken).filter(PasswordResetToken.token_hash == token_hash).first()
+
+  if not reset_record or reset_record.used_at is not None or reset_record.expires_at < datetime.now(timezone.utc):
+    raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+  user = db.query(Staff).filter(Staff.id == reset_record.user_id).first()
+  if not user:
+    raise HTTPException(status_code=404, detail="User not found")
+
+  user.password_hash = hash_password(data.new_password)
+  reset_record.used_at = datetime.now(timezone.utc)
+  db.query(PasswordResetToken).filter(
+    PasswordResetToken.user_id == user.id,
+    PasswordResetToken.used_at.is_(None)
+  ).update(
+    {"used_at": datetime.now(timezone.utc)},
+    synchronize_session=False
+  )
+  
+  db.commit()
+
+  return {"message": "Password has been reset successfully"}

@@ -8,3 +8,9 @@ class StaffSignUp (BaseModel):
 class StaffLogin (BaseModel):
   email : EmailStr
   password : str = Field (min_length = 8)
+
+
+
+class ResetPasswordRequest(BaseModel):
+  token: str
+  new_password: str

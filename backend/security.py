@@ -1,3 +1,5 @@
+import secrets
+
 from pwdlib import PasswordHash
 import os 
 from dotenv import load_dotenv
@@ -25,3 +27,7 @@ def create_access_token(user_id : int):
   payload = {"sub" : str(user_id), "exp":token_exp_time}
   token = jwt.encode(payload, SECRET_KEY, "HS256")
   return token
+
+def create_reset_password_token():
+    token = secrets.token_urlsafe(32)
+    return token

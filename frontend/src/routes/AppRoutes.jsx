@@ -3,11 +3,13 @@ import App from "../pages/App.jsx";
 
 import Home from "../pages/Home";
 import ProtectedRoute from "./ProtectedRoute";
+import ResetPassword from "../pages/ResetPassword";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<App />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route
         path="/home"
         element={
