@@ -89,6 +89,9 @@ def reset_password (data : ResetPasswordRequest, db : Session = Depends(get_db))
   if not reset_record or reset_record.used_at is not None or reset_record.expires_at < datetime.now(timezone.utc):
     raise HTTPException(status_code=400, detail="Invalid or expired token")
 
+  if reset_record.used_at is not None:
+    raise HTTPException(status_code=400, detail="Token has already been used")
+
   user = db.query(Staff).filter(Staff.id == reset_record.user_id).first()
   if not user:
     raise HTTPException(status_code=404, detail="User not found")
