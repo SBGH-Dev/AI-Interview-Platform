@@ -132,3 +132,45 @@ def create_job (request : Request , data: JobCreate, db : Session = Depends(get_
   db.commit()
   db.refresh(new_job)
   return {"message": "Job created successfully"}
+
+
+@app.get("/jobs", status_code=200)
+@limiter.limit("30/minute")
+def get_jobs(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Staff = Depends(get_current_user)
+):
+    jobs = db.query(Job).order_by(Job.created_at.desc()).all()
+
+    return {
+        "jobs": [
+            {
+                "id": job.id,
+                "title": job.title,
+                "department": job.department,
+                "status": job.status,
+                "created_at": job.created_at
+            }
+            for job in jobs
+        ]
+    }
+
+
+@app.get("/jobs-count", status_code=200)
+@limiter.limit("20/minute")  
+def get_job_count (request : Request, db : Session = Depends(get_db), current_user : Staff =  Depends(get_current_user)):
+  job_count = db.query(Job).count()
+  open_jobs = db.query(Job).filter(
+  Job.status == "open"
+  ).count()
+  closed_jobs = db.query(Job).filter(
+  Job.status == "closed"
+  ).count()
+
+  return {
+  "total_jobs": job_count,
+  "open_jobs": open_jobs,
+  "closed_jobs": closed_jobs,
+  "total_candidates": 0
+  }

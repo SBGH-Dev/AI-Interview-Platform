@@ -1,6 +1,6 @@
 import "./Jobs.css";
 import NavBar from "../components/NavBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { apiUrl } from "../api";
 import { showErrorAlert, showSuccessAlert } from "../alerts";
 
@@ -11,6 +11,14 @@ function Jobs() {
   const [department, setDepartment] = useState("");
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState("");
+
+  const [jobStats, setJobStats] = useState({
+    total_jobs: 0,
+    open_jobs: 0,
+    closed_jobs: 0,
+    total_candidates: 0,
+  });
+  const [jobs, setJobs] = useState([]);
 
   const handleCreateJob = () => {
     setIsCreateJobEnabled(true);
@@ -59,6 +67,53 @@ function Jobs() {
     }
   };
 
+  useEffect(() => {
+    const fetchJobStats = async () => {
+      try {
+        const response = await fetch(apiUrl("/jobs-count"), {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("Token")}`,
+          },
+        });
+
+        if (!response.ok) {
+          showErrorAlert("Failed to fetch job statistics");
+        }
+
+        const data = await response.json();
+        setJobStats(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchJobStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch(apiUrl("/jobs"), {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("Token")}`,
+          },
+        });
+
+        if (!response.ok) {
+          showErrorAlert("Failed to fetch jobs");
+        }
+
+        const data = await response.json();
+        setJobs(data.jobs);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
   return (
     <>
       <NavBar />
@@ -78,8 +133,66 @@ function Jobs() {
             </div>
           </div>
 
-          <div className="jobs-cards"></div>
-          <div className="jobs-table"></div>
+          <div className="jobs-cards">
+            <div className="job-card">
+              <p>Total Jobs</p>
+              <h2>{jobStats.total_jobs}</h2>
+            </div>
+
+            <div className="job-card">
+              <p>Open Jobs</p>
+              <h2>{jobStats.open_jobs}</h2>
+            </div>
+
+            <div className="job-card">
+              <p>Closed Jobs</p>
+              <h2>{jobStats.closed_jobs}</h2>
+            </div>
+
+            <div className="job-card">
+              <p>Total Candidates</p>
+              <h2>{jobStats.total_candidates}</h2>
+            </div>
+          </div>
+          <div className="jobs-table">
+            <h3>All Jobs</h3>
+
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Job ID</th>
+                    <th>Job Title</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {jobs.length === 0 ? (
+                    <tr>
+                      <td colSpan="5">No jobs found</td>
+                    </tr>
+                  ) : (
+                    jobs.map((job) => (
+                      <tr key={job.id}>
+                        <td>#{job.id}</td>
+                        <td>{job.title}</td>
+                        <td>{job.department}</td>
+                        <td>
+                          <span className={`job-status ${job.status}`}>
+                            {job.status}
+                          </span>
+                        </td>
+                        <td>{new Date(job.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="create-job-page">
