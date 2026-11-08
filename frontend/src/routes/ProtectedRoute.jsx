@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { apiUrl } from "../api";
 
 function ProtectedRoute({ children }) {
-  const url = "http://127.0.0.1:8000/verify-user";
   const [status, setStatus] = useState("loading");
   useEffect(() => {
     const verifyUser = async () => {
@@ -13,7 +13,7 @@ function ProtectedRoute({ children }) {
       }
 
       try {
-        const response = await fetch(url, {
+        const response = await fetch(apiUrl("/verify-user"), {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });

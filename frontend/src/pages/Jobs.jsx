@@ -1,6 +1,8 @@
 import "./Jobs.css";
 import NavBar from "../components/NavBar";
 import { useState } from "react";
+import { apiUrl } from "../api";
+import { showErrorAlert, showSuccessAlert } from "../alerts";
 
 function Jobs() {
   const [isCreateJobEnabled, setIsCreateJobEnabled] = useState(false);
@@ -18,7 +20,7 @@ function Jobs() {
     setIsCreateJobEnabled(false);
   };
 
-  const handleSubmitJob = (event) => {
+  const handleSubmitJob = async (event) => {
     event.preventDefault();
 
     const jobData = {
@@ -28,13 +30,33 @@ function Jobs() {
       requirements: requirements,
     };
 
-    console.log("Job Data:", jobData);
+    try {
+      const response = await fetch(apiUrl("/create-job"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("Token")}`,
+        },
+        body: JSON.stringify(jobData),
+      });
 
-    setIsCreateJobEnabled(false);
-    setJobTitle("");
-    setDepartment("");
-    setDescription("");
-    setRequirements("");
+      const result = await response.json();
+
+      if (!response.ok) {
+        showErrorAlert(result.detail || "Failed to create job.");
+        return;
+      }
+
+      showSuccessAlert(result.message || "Job created successfully.");
+      setIsCreateJobEnabled(false);
+      setJobTitle("");
+      setDepartment("");
+      setDescription("");
+      setRequirements("");
+    } catch (error) {
+      console.error("Error creating job:", error);
+      showErrorAlert("Cannot connect to the server. Please try again.");
+    }
   };
 
   return (

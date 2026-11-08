@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
+import { apiUrl } from "../api";
+import { showErrorAlert, showSuccessAlert } from "../alerts";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -8,21 +10,19 @@ function ResetPassword() {
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-
   const handleResetPassword = async (event) => {
     event.preventDefault();
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match.");
+      showErrorAlert("Passwords do not match.");
       return;
     }
     if (!token) {
-      setMessage("Invalid password reset link.");
+      showErrorAlert("Invalid password reset link.");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:8000/reset-password", {
+      const response = await fetch(apiUrl("/reset-password"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,16 +32,14 @@ function ResetPassword() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setMessage(errorData.detail || "Failed to reset password.");
+        showErrorAlert(errorData.detail || "Failed to reset password.");
         return;
       } else {
-        setMessage("Password reset successful! Redirecting to login...");
-        setTimeout(() => {
-          navigate("/");
-        }, 10000); // Redirect after 10 seconds
+        await showSuccessAlert("Your password has been reset. You can now sign in.");
+        navigate("/");
       }
-    } catch (error) {
-      setMessage("An error occurred. Please try again later.");
+    } catch {
+      showErrorAlert("Cannot connect to the server. Please try again.");
     }
   };
 
@@ -71,8 +69,6 @@ function ResetPassword() {
 
         <button type="submit">Reset Password</button>
       </form>
-
-      <p>{message}</p>
     </div>
   );
 }

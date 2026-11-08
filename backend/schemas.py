@@ -13,3 +13,9 @@ class StaffLogin (BaseModel):
 class ResetPasswordRequest(BaseModel):
   token: str
   new_password: str
+
+class JobCreate(BaseModel):
+    title: str
+    department: str
+    description: str
+    requirements: str

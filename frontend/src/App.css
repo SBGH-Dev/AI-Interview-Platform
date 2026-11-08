@@ -126,16 +126,6 @@ body {
   margin-top: 15px;
 }
 
-.pass-error {
-  display: block;
-  text-align: center;
-  border: none;
-  border-radius: 10px;
-  color: white;
-  padding: 5px 10px;
-  background-color: rgb(229, 91, 91);
-}
-
 .forget-pass-page {
   display: flex;
   flex-direction: column;

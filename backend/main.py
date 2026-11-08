@@ -2,9 +2,9 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 from fastapi import Body, FastAPI, Depends, HTTPException,  Request
 from sqlalchemy.orm import Session
-from schemas import StaffSignUp, StaffLogin, ResetPasswordRequest
+from schemas import StaffSignUp, StaffLogin, ResetPasswordRequest, JobCreate
 from database import get_db
-from models import Staff, PasswordResetToken
+from models import Staff, PasswordResetToken, Job
 from security import create_reset_password_token, hash_password, check_password, create_access_token
 from auth import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +12,7 @@ from email_service import send_reset_email
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -116,3 +117,18 @@ def reset_password ( request : Request, data : ResetPasswordRequest, db : Sessio
   db.commit()
 
   return {"message": "Password has been reset successfully"}
+
+
+@app.post("/create-job", status_code=201)
+@limiter.limit("20/minute")  
+
+def create_job (request : Request , data: JobCreate, db : Session = Depends(get_db), current_user: Staff = Depends(get_current_user)):
+
+  is_saved_before = db.query(Job).filter(Job.title == data.title, Job.department == data.department).first()
+  if is_saved_before:
+    raise HTTPException (status_code=409, detail="This Job Already Exist For The Same Department, Please Delete It First Or Change The Old One")
+  new_job = Job(title=data.title, department=data.department, description=data.description, requirements = data.requirements )
+  db.add(new_job)
+  db.commit()
+  db.refresh(new_job)
+  return {"message": "Job created successfully"}

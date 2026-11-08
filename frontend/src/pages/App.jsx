@@ -4,6 +4,8 @@ import { BrainCircuit, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useState } from "react";
+import { apiUrl } from "../api";
+import { showErrorAlert, showSuccessAlert } from "../alerts";
 
 function App() {
   const currentYear = new Date().getFullYear();
@@ -12,13 +14,11 @@ function App() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
   const [forgetpassword, setForgotPassword] = useState(false);
   const navigate = useNavigate();
   const handleSignUpLinkClick = (event) => {
     event.preventDefault();
     setIsLogin(!isLogin);
-    setError("");
     setPassword("");
     setConfirmPassword("");
     setEmail("");
@@ -28,33 +28,32 @@ function App() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!isLogin && password !== confirmPassword) {
-      setError("Password Dont Match");
+      showErrorAlert("Passwords do not match.");
       return;
-    } else {
-      setError("");
     }
-    const login = { email: email, password: password };
-    const signup = { full_name: fullName, email: email, password: password };
-    const url = isLogin
-      ? "http://127.0.0.1:8000/login"
-      : "http://127.0.0.1:8000/signup";
 
-    const payload = isLogin ? login : signup;
+    try {
+      const payload = isLogin
+        ? { email, password }
+        : { full_name: fullName, email, password };
+      const response = await fetch(apiUrl(isLogin ? "/login" : "/signup"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      const data = await response.json();
 
-    const data = await response.json();
+      if (!response.ok) {
+        await showErrorAlert(data.detail || "Unable to complete your request.");
+        return;
+      }
 
-    if (response.ok) {
-      const token = data.access_token;
-      sessionStorage.setItem("Token", token);
+      sessionStorage.setItem("Token", data.access_token);
+
       navigate("/home");
-    } else {
-      setError(data.detail);
+    } catch {
+      showErrorAlert("Cannot connect to the server. Please try again.");
     }
   };
 
@@ -67,15 +66,13 @@ function App() {
     event.preventDefault();
     setForgotPassword(false);
     setIsLogin(true);
-    setError("");
   };
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
-    setError("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/forgot-password", {
+      const response = await fetch(apiUrl("/forgot-password"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,12 +83,16 @@ function App() {
       const data = await response.json();
 
       if (response.ok) {
-        setError(data.message);
+        showSuccessAlert(
+          data.message || "Password reset instructions have been sent.",
+        );
       } else {
-        setError("Failed to send reset link. Please try again.");
+        showErrorAlert(
+          data.detail || "Failed to send reset link. Please try again.",
+        );
       }
-    } catch (error) {
-      setError("Cannot connect to the server.");
+    } catch {
+      showErrorAlert("Cannot connect to the server. Please try again.");
     }
   };
   return (
@@ -186,7 +187,6 @@ function App() {
                   </a>
                 )}
 
-                {error && <p className="pass-error">{error}</p>}
                 <button type="submit">{isLogin ? "Sign In" : "Sign Up"}</button>
               </form>
               <a
@@ -225,8 +225,6 @@ function App() {
               </div>
               <button type="submit">Send Link</button>
             </form>
-
-            {error && <p className="reset-message">{error}</p>}
 
             <div className="back-to-home">
               <ArrowLeft size={20} />

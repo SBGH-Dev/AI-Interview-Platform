@@ -1,5 +1,13 @@
 # React + Vite
 
+## API configuration
+
+Set `VITE_API_BASE_URL` in `frontend/.env` to the backend base URL. Copy
+`frontend/.env.example` to `frontend/.env` and update the value for your
+environment. Restart the Vite dev server after changing environment variables.
+Vite embeds these values in the client bundle, so do not put secrets in this
+file.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
