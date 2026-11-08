@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import hashlib
-import token
-
-from fastapi import Body, FastAPI, Depends, HTTPException, status
+from fastapi import Body, FastAPI, Depends, HTTPException,  Request
 from sqlalchemy.orm import Session
 from schemas import StaffSignUp, StaffLogin, ResetPasswordRequest
 from database import get_db
@@ -11,8 +9,11 @@ from security import create_reset_password_token, hash_password, check_password,
 from auth import get_current_user
 from fastapi.middleware.cors import CORSMiddleware
 from email_service import send_reset_email
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
-
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -21,11 +22,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 ## New Users
 @app.post("/signup", status_code = 201)
-def sign_up (data : StaffSignUp, db : Session = Depends(get_db)):
+@limiter.limit("5/minute")  
+def sign_up ( request : Request, data : StaffSignUp, db : Session = Depends(get_db)):
   email_exist = db.query(Staff).filter(Staff.email == data.email).first()
   if email_exist : raise HTTPException (status_code = 409, detail="Email Already Exists")
   hashed_password = hash_password(data.password)
@@ -37,9 +41,11 @@ def sign_up (data : StaffSignUp, db : Session = Depends(get_db)):
 
   return {"Message": "User Has Been Created", "User ID" : user.id, "token_type" : "bearer", "access_token" : token}
 
+
 ## Login
 @app.post("/login", status_code = 200)
-def login (data : StaffLogin, db : Session = Depends(get_db)):
+@limiter.limit("5/minute")  
+def login ( request : Request, data : StaffLogin, db : Session = Depends(get_db)):
   user = db.query(Staff).filter(Staff.email == data.email).first()
   if not user : raise HTTPException (status_code = 401, detail="Invalid email or password")
 
@@ -61,10 +67,11 @@ def verify_user (current_user : Staff = Depends(get_current_user)):
   return{"user_id": current_user.id,"full_name" : current_user.full_name,"user_email":current_user.email}
 
 
+ 
 
 @app.post("/forgot-password", status_code = 200)
-
-def forgot_password (email : str =Body(embed=True), db : Session = Depends(get_db)):
+@limiter.limit("5/minute")  
+def forgot_password ( request : Request, email : str =Body(embed=True), db : Session = Depends(get_db)):
   user = db.query(Staff).filter(Staff.email == email).first()
   if not user:
     return {"message": "If the email exists, password reset instructions will be sent"}
@@ -81,16 +88,16 @@ def forgot_password (email : str =Body(embed=True), db : Session = Depends(get_d
   return {"message": "If the email exists, password reset instructions will be sent"}
 
 
+
 @app.post("/reset-password", status_code = 200)
-def reset_password (data : ResetPasswordRequest, db : Session = Depends(get_db)):
+@limiter.limit("5/minute")  
+def reset_password ( request : Request, data : ResetPasswordRequest, db : Session = Depends(get_db)):
   token_hash = hashlib.sha256(data.token.encode()).hexdigest()
   reset_record = db.query(PasswordResetToken).filter(PasswordResetToken.token_hash == token_hash).first()
 
   if not reset_record or reset_record.used_at is not None or reset_record.expires_at < datetime.now(timezone.utc):
     raise HTTPException(status_code=400, detail="Invalid or expired token")
 
-  if reset_record.used_at is not None:
-    raise HTTPException(status_code=400, detail="Token has already been used")
 
   user = db.query(Staff).filter(Staff.id == reset_record.user_id).first()
   if not user:
