@@ -5,6 +5,11 @@
   gap: 20px;
   align-items: center;
   border-bottom: 1px solid #ccc;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(5px);
 }
 
 .nav-links {

@@ -1,0 +1,168 @@
+.jobs-page {
+  padding: 10px;
+  min-height: 100vh;
+  background-color: #ebedf1;
+}
+
+.jobs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+
+  background-color: white;
+  padding: 25px 30px;
+  border-radius: 15px;
+  border: 1px solid #e1e6ed;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.jobs-header-left h2 {
+  font-size: 32px;
+  margin: 0;
+  color: #102d46;
+}
+
+.jobs-header-left p {
+  font-size: 14px;
+  color: #788397;
+  margin-top: 10px;
+}
+
+.create-job-button {
+  background-color: #137f75;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.create-job-button:hover {
+  background-color: #0d6b61;
+}
+
+.create-job-page {
+  min-height: calc(100vh - 80px);
+  background-color: #ebedf1;
+  padding: 40px 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.create-job-form {
+  width: 100%;
+  max-width: auto;
+  background-color: white;
+  padding: 35px;
+  border-radius: 15px;
+  border: 1px solid #e1e6ed;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.create-job-form h2 {
+  font-size: 28px;
+  color: #102d46;
+  margin: 0 0 10px;
+}
+
+.create-job-form > p {
+  font-size: 14px;
+  color: #788397;
+  margin-bottom: 30px;
+}
+
+.create-job-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.create-job-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.create-job-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #102d46;
+}
+
+.create-job-form-group input,
+.create-job-form-group textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #e1e6ed;
+  border-radius: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #102d46;
+  outline: none;
+}
+
+.create-job-form-group textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.create-job-form-group input:focus,
+.create-job-form-group textarea:focus {
+  border-color: #137f75;
+  box-shadow: 0 0 0 3px rgba(19, 127, 117, 0.1);
+}
+
+.create-job-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.cancel-job-button,
+.submit-job-button {
+  padding: 14px 25px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-job-button {
+  background-color: white;
+  border: 1px solid #d1d5db;
+  color: #102d46;
+}
+
+.cancel-job-button:hover {
+  background-color: #f3f4f6;
+}
+
+.submit-job-button {
+  background-color: #137f75;
+  color: white;
+  border: none;
+}
+
+.submit-job-button:hover {
+  background-color: #0d6b61;
+}
+
+@media (max-width: 600px) {
+  .create-job-form {
+    padding: 24px 18px;
+  }
+
+  .create-job-actions {
+    flex-direction: column;
+  }
+
+  .create-job-actions button {
+    width: 100%;
+  }
+}
